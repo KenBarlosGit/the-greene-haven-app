@@ -1,6 +1,7 @@
 import CalendarView from '../CalendarView';
 import type { CalendarState } from '../../hooks/useCalendar';
 import { formatLongDate, formatRange, nightsBetween } from '../../lib/date';
+import { calculateTotal, formatCurrency, formatRate } from '../../lib/pricing';
 
 interface Props {
   calendar: CalendarState;
@@ -30,17 +31,19 @@ const DateStep = ({
     if (!rangeEnd)
       return `Tap another day to set your check-out — or tap ${formatLongDate(rangeStart)} again for a single-day stay.`;
     const nights = nightsBetween(rangeStart, rangeEnd);
+    const total = formatCurrency(calculateTotal(nights));
     return nights === 0
-      ? `${formatLongDate(rangeStart)} · single day`
-      : `${formatRange(rangeStart, rangeEnd)} · ${nights} ${nights === 1 ? 'night' : 'nights'}`;
+      ? `${formatLongDate(rangeStart)} · single day · ${total}`
+      : `${formatRange(rangeStart, rangeEnd)} · ${nights} ${nights === 1 ? 'night' : 'nights'} · ${total}`;
   })();
 
   return (
     <div>
       <h4 className="text-brand-900 text-base font-semibold mb-1">Pick your dates</h4>
-      <p className="text-zinc-500 text-sm mb-5">
+      <p className="text-zinc-500 text-sm mb-1">
         Green-tinted dates are already booked. Past dates are disabled.
       </p>
+      <p className="text-brand-700 text-xs font-medium mb-5">Rate: {formatRate()}</p>
       <CalendarView
         calendar={calendar}
         today={today}
