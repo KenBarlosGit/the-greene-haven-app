@@ -1,14 +1,15 @@
-import { CalendarPlus, Pencil, Trash2, Users, Moon } from 'lucide-react';
+import { CalendarPlus, Pencil, Trash2, Users, Moon, Lock } from 'lucide-react';
 import type { Booking } from '../types/booking';
 import { formatRange, fromISODateOnly, nightsBetween } from '../lib/date';
 
 interface Props {
   bookings: Booking[];
+  canEdit: (booking: Booking) => boolean;
   onEdit: (booking: Booking) => void;
-  onDelete: (id: string) => void;
+  onDelete: (booking: Booking) => void;
 }
 
-const BookingsList = ({ bookings, onEdit, onDelete }: Props) => {
+const BookingsList = ({ bookings, canEdit, onEdit, onDelete }: Props) => {
   if (bookings.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-14 px-6 rounded-xl border border-dashed border-brand-200 bg-brand-50/60">
@@ -27,6 +28,7 @@ const BookingsList = ({ bookings, onEdit, onDelete }: Props) => {
         const start = fromISODateOnly(booking.startDateISO);
         const end = fromISODateOnly(booking.endDateISO);
         const nights = nightsBetween(start, end);
+        const editable = canEdit(booking);
         return (
           <li
             key={booking.id}
@@ -54,22 +56,34 @@ const BookingsList = ({ bookings, onEdit, onDelete }: Props) => {
               </p>
             </div>
             <div className="flex items-center gap-1 self-end sm:self-center">
-              <button
-                type="button"
-                onClick={() => onEdit(booking)}
-                className="p-2 rounded-md text-zinc-500 hover:text-brand-800 hover:bg-brand-50 transition-colors"
-                aria-label={`Edit booking for ${booking.guestName}`}
-              >
-                <Pencil size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => onDelete(booking.id)}
-                className="p-2 rounded-md text-zinc-500 hover:text-red-600 hover:bg-zinc-100 transition-colors"
-                aria-label={`Delete booking for ${booking.guestName}`}
-              >
-                <Trash2 size={16} />
-              </button>
+              {editable ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onEdit(booking)}
+                    className="p-2 rounded-md text-zinc-500 hover:text-brand-800 hover:bg-brand-50 transition-colors"
+                    aria-label={`Edit booking for ${booking.guestName}`}
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(booking)}
+                    className="p-2 rounded-md text-zinc-500 hover:text-red-600 hover:bg-zinc-100 transition-colors"
+                    aria-label={`Delete booking for ${booking.guestName}`}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </>
+              ) : (
+                <span
+                  className="p-2 text-zinc-300"
+                  title="Booked by another user"
+                  aria-label="Booked by another user"
+                >
+                  <Lock size={14} />
+                </span>
+              )}
             </div>
           </li>
         );

@@ -1,5 +1,6 @@
 export interface Booking {
   id: string;
+  userId: string | null;
   startDateISO: string;
   endDateISO: string;
   time: string;
@@ -9,7 +10,7 @@ export interface Booking {
   notes: string;
 }
 
-export type BookingDraft = Omit<Booking, 'id'>;
+export type BookingDraft = Omit<Booking, 'id' | 'userId'>;
 
 export type FormStep = 1 | 2 | 3;
 

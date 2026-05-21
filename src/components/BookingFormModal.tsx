@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import type { Booking, BookingDraft, DateRange, FormStep } from '../types/booking';
 import { useCalendar } from '../hooks/useCalendar';
 import type { ToastVariant } from '../hooks/useToast';
@@ -15,7 +15,7 @@ interface Props {
   initialRange: DateRange | null;
   editing: Booking | null;
   onClose: () => void;
-  onSubmit: (draft: BookingDraft, editingId?: string) => void;
+  onSubmit: (draft: BookingDraft, editingId?: string) => Promise<void>;
   onStepChange: (step: FormStep) => void;
   checkConflict: (candidate: {
     startDateISO: string;
@@ -66,6 +66,7 @@ const BookingFormModal = ({
   const [form, setForm] = useState<DetailsForm>(emptyForm);
   const [errors, setErrors] = useState<DetailsErrors>({});
   const [ackConflict, setAckConflict] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const calendar = useCalendar(initialRange?.start ?? today);
 
@@ -91,6 +92,7 @@ const BookingFormModal = ({
     setHoveredDate(null);
     setErrors({});
     setAckConflict(false);
+    setSubmitting(false);
     // calendar.setView is stable (useCallback); intentionally omit other deps so this
     // only runs on transitions of open/editing/initialRange.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,8 +186,8 @@ const BookingFormModal = ({
     if (step === 3) setStep(2);
   };
 
-  const submit = () => {
-    if (!rangeStart) return;
+  const submit = async () => {
+    if (!rangeStart || submitting) return;
     const effectiveEnd = rangeEnd ?? rangeStart;
     if (conflict && !ackConflict) {
       setAckConflict(true);
@@ -200,7 +202,14 @@ const BookingFormModal = ({
       partySize: form.partySize,
       notes: form.notes.trim(),
     };
-    onSubmit(draft, editing?.id);
+    setSubmitting(true);
+    try {
+      await onSubmit(draft, editing?.id);
+    } catch {
+      // parent surfaces the error via toast; leave the modal open
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const primaryLabel =
@@ -214,7 +223,7 @@ const BookingFormModal = ({
           : 'Confirm booking'
       : 'Continue';
 
-  const canGoNext = step === 1 ? rangeStart !== null : true;
+  const canGoNext = (step === 1 ? rangeStart !== null : true) && !submitting;
 
   const confirmStart = rangeStart;
   const confirmEnd = rangeEnd ?? rangeStart;
@@ -307,8 +316,14 @@ const BookingFormModal = ({
                 : 'bg-zinc-200 text-zinc-400 cursor-not-allowed shadow-none',
             )}
           >
-            {primaryLabel}
-            {step === 3 ? <Check size={16} /> : <ArrowRight size={16} />}
+            {submitting ? 'Saving…' : primaryLabel}
+            {submitting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : step === 3 ? (
+              <Check size={16} />
+            ) : (
+              <ArrowRight size={16} />
+            )}
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import StepIndicator from './StepIndicator';
 import CalendarView from './CalendarView';
 import BookingsList from './BookingsList';
@@ -11,10 +11,22 @@ import { useToast } from '../hooks/useToast';
 import type { Booking, BookingDraft, DateRange, FormStep } from '../types/booking';
 import { expandRangeISO, isPastDay } from '../lib/date';
 
-const BookingApp = () => {
+interface Props {
+  currentUserId: string | null;
+}
+
+const BookingApp = ({ currentUserId }: Props) => {
   const today = useMemo(() => new Date(), []);
   const calendar = useCalendar(today);
-  const { bookings, addBooking, updateBooking, deleteBooking, checkConflict } = useBookings();
+  const {
+    bookings,
+    loading,
+    error,
+    addBooking,
+    updateBooking,
+    deleteBooking,
+    checkConflict,
+  } = useBookings(currentUserId);
   const { toast, showToast, dismiss } = useToast();
 
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
@@ -42,12 +54,19 @@ const BookingApp = () => {
     return s;
   }, [bookings]);
 
+  const canEdit = (b: Booking): boolean =>
+    currentUserId === null || b.userId === null || b.userId === currentUserId;
+
   const openForNewBooking = () => {
     setEditing(null);
     setModalOpen(true);
   };
 
   const openForEdit = (booking: Booking) => {
+    if (!canEdit(booking)) {
+      showToast('You can only edit bookings you created.', 'warning');
+      return;
+    }
     setEditing(booking);
     setModalOpen(true);
   };
@@ -74,18 +93,36 @@ const BookingApp = () => {
 
   const handleBookedAttemptInline = () => {
     showToast(
-      'That date is already booked. Use the Edit button on the existing booking to change it.',
+      'That date is already booked. Use the Edit button on your own booking to change it.',
       'warning',
     );
   };
 
-  const handleSubmit = (draft: BookingDraft, editingId?: string) => {
-    if (editingId) updateBooking(editingId, draft);
-    else addBooking(draft);
-    closeModal();
-    setRangeStart(null);
-    setRangeEnd(null);
-    showToast(editingId ? 'Booking updated.' : 'Booking confirmed.', 'success');
+  const handleDelete = async (b: Booking) => {
+    if (!canEdit(b)) {
+      showToast('You can only delete bookings you created.', 'warning');
+      return;
+    }
+    try {
+      await deleteBooking(b.id);
+      showToast('Booking deleted.', 'success');
+    } catch (err) {
+      showToast(`Could not delete: ${(err as Error).message}`, 'warning');
+    }
+  };
+
+  const handleSubmit = async (draft: BookingDraft, editingId?: string) => {
+    try {
+      if (editingId) await updateBooking(editingId, draft);
+      else await addBooking(draft);
+      closeModal();
+      setRangeStart(null);
+      setRangeEnd(null);
+      showToast(editingId ? 'Booking updated.' : 'Booking confirmed.', 'success');
+    } catch (err) {
+      showToast(`Could not save: ${(err as Error).message}`, 'warning');
+      throw err;
+    }
   };
 
   const initialRange = useMemo<DateRange | null>(
@@ -117,6 +154,12 @@ const BookingApp = () => {
           </button>
         </div>
 
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">
+            Couldn’t load bookings: {error}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-6">
           <CalendarView
             calendar={calendar}
@@ -137,11 +180,18 @@ const BookingApp = () => {
                 {bookings.length} {bookings.length === 1 ? 'booking' : 'bookings'}
               </span>
             </div>
-            <BookingsList
-              bookings={bookings}
-              onEdit={openForEdit}
-              onDelete={deleteBooking}
-            />
+            {loading ? (
+              <div className="flex items-center gap-2 py-10 justify-center text-zinc-500 text-sm">
+                <Loader2 size={16} className="animate-spin" /> Loading bookings…
+              </div>
+            ) : (
+              <BookingsList
+                bookings={bookings}
+                canEdit={canEdit}
+                onEdit={openForEdit}
+                onDelete={handleDelete}
+              />
+            )}
           </div>
         </div>
       </section>
