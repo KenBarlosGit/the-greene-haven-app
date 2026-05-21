@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Booking, BookingDraft } from '../types/booking';
 import { findConflict } from '../lib/conflicts';
 import { isSupabaseEnabled, supabase } from '../lib/supabase';
@@ -65,7 +65,6 @@ export function useBookings(authUserId: string | null): UseBookingsResult {
   );
   const [loading, setLoading] = useState<boolean>(isSupabaseEnabled);
   const [error, setError] = useState<string | null>(null);
-  const initialisedFor = useRef<string | null>(null);
 
   // ── Supabase-backed mode ────────────────────────────────────────────────
   useEffect(() => {
@@ -76,11 +75,10 @@ export function useBookings(authUserId: string | null): UseBookingsResult {
       setLoading(false);
       return;
     }
-    if (initialisedFor.current === authUserId) return;
-    initialisedFor.current = authUserId;
 
     let cancelled = false;
     setLoading(true);
+    setError(null);
 
     (async () => {
       const { data, error: fetchErr } = await sb

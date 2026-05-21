@@ -1,5 +1,15 @@
-import { AlertTriangle, Calendar, Clock, Mail, Users, MessageSquare, Moon } from 'lucide-react';
+import {
+  AlertTriangle,
+  Calendar,
+  Clock,
+  Mail,
+  Users,
+  MessageSquare,
+  Moon,
+  PhilippinePeso,
+} from 'lucide-react';
 import { formatRange, nightsBetween } from '../../lib/date';
+import { billableNights, calculateTotal, formatCurrency, RATE_PER_NIGHT } from '../../lib/pricing';
 
 interface Props {
   start: Date;
@@ -23,6 +33,8 @@ const ConfirmStep = ({
   conflictMessage,
 }: Props) => {
   const nights = nightsBetween(start, end);
+  const billed = billableNights(nights);
+  const total = calculateTotal(nights);
 
   return (
     <div>
@@ -46,6 +58,13 @@ const ConfirmStep = ({
         />
         <Row icon={<Mail size={14} />} label="Email" value={guestEmail} />
         {notes && <Row icon={<MessageSquare size={14} />} label="Notes" value={notes} />}
+        <Row
+          icon={<PhilippinePeso size={14} />}
+          label="Total"
+          value={`${formatCurrency(total)}`}
+          hint={`${billed} × ${formatCurrency(RATE_PER_NIGHT)}`}
+          emphasis
+        />
       </dl>
 
       {conflictMessage && (
@@ -62,14 +81,25 @@ interface RowProps {
   icon: React.ReactNode;
   label: string;
   value: string;
+  hint?: string;
+  emphasis?: boolean;
 }
 
-const Row = ({ icon, label, value }: RowProps) => (
+const Row = ({ icon, label, value, hint, emphasis }: RowProps) => (
   <div className="flex items-start gap-3 px-4 py-3">
-    <span className="text-zinc-400 mt-0.5">{icon}</span>
+    <span className={emphasis ? 'text-brand-700 mt-0.5' : 'text-zinc-400 mt-0.5'}>{icon}</span>
     <div className="flex-1 min-w-0">
       <dt className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium">{label}</dt>
-      <dd className="text-zinc-900 text-sm font-medium break-words">{value}</dd>
+      <dd
+        className={
+          emphasis
+            ? 'text-brand-900 text-base font-bold tabular-nums break-words'
+            : 'text-zinc-900 text-sm font-medium break-words'
+        }
+      >
+        {value}
+      </dd>
+      {hint && <p className="text-xs text-zinc-500 mt-0.5">{hint}</p>}
     </div>
   </div>
 );

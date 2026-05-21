@@ -1,6 +1,7 @@
 import { CalendarPlus, Pencil, Trash2, Users, Moon, Lock } from 'lucide-react';
 import type { Booking } from '../types/booking';
 import { formatRange, fromISODateOnly, nightsBetween } from '../lib/date';
+import { calculateTotal, formatCurrency } from '../lib/pricing';
 
 interface Props {
   bookings: Booking[];
@@ -38,13 +39,16 @@ const BookingsList = ({ bookings, canEdit, onEdit, onDelete }: Props) => {
               <div className="text-brand-900 text-sm font-semibold">
                 {formatRange(start, end)}
               </div>
-              <div className="text-zinc-500 text-xs mt-0.5 flex items-center gap-2">
+              <div className="text-zinc-500 text-xs mt-0.5 flex items-center flex-wrap gap-x-2 gap-y-0.5">
                 <span className="tabular-nums">{booking.time}</span>
                 {nights > 0 && (
                   <span className="inline-flex items-center gap-1 text-brand-700">
                     <Moon size={11} /> {nights} {nights === 1 ? 'night' : 'nights'}
                   </span>
                 )}
+                <span className="text-brand-800 font-semibold tabular-nums">
+                  {formatCurrency(calculateTotal(nights))}
+                </span>
               </div>
             </div>
             <div className="flex-1 min-w-0">

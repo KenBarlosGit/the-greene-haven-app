@@ -2,10 +2,15 @@ import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase, isSupabaseEnabled } from '../lib/supabase';
 
+export interface AuthResult {
+  error: string | null;
+}
+
 export interface AuthState {
   user: User | null;
   loading: boolean;
-  signInWithEmail: (email: string) => Promise<{ error: string | null }>;
+  signInWithPassword: (email: string, password: string) => Promise<AuthResult>;
+  signUp: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -34,19 +39,35 @@ export function useAuth(): AuthState {
     };
   }, []);
 
-  const signInWithEmail = useCallback(async (email: string) => {
-    if (!supabase) return { error: 'Supabase is not configured.' };
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: window.location.href },
-    });
-    return { error: error?.message ?? null };
-  }, []);
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      if (!supabase) return { error: 'Supabase is not configured.' };
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      return { error: error?.message ?? null };
+    },
+    [],
+  );
+
+  const signUp = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      if (!supabase) return { error: 'Supabase is not configured.' };
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: window.location.href },
+      });
+      return { error: error?.message ?? null };
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
   }, []);
 
-  return { user, loading, signInWithEmail, signOut };
+  return { user, loading, signInWithPassword, signUp, signOut };
 }

@@ -2,6 +2,7 @@ import { Calendar, Clock, Check } from 'lucide-react';
 import type { DateRange, FormStep } from '../types/booking';
 import { cn } from '../lib/cn';
 import { formatRange, nightsBetween } from '../lib/date';
+import { calculateTotal, formatCurrency, formatRate } from '../lib/pricing';
 
 interface Props {
   currentStep: FormStep;
@@ -27,6 +28,9 @@ const StepIndicator = ({ currentStep, selectedRange }: Props) => {
         <p className="text-zinc-500 text-sm mt-2 leading-relaxed">
           A quiet, sustainable retreat. Three small steps and you’re booked.
         </p>
+        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 border border-brand-100">
+          {formatRate()}
+        </div>
       </div>
 
       <ol className="flex flex-col">
@@ -81,6 +85,9 @@ const StepIndicator = ({ currentStep, selectedRange }: Props) => {
                         {' '}· {nights} {nights === 1 ? 'night' : 'nights'}
                       </span>
                     )}
+                    <span className="block text-brand-700 mt-0.5 tabular-nums">
+                      {formatCurrency(calculateTotal(nights))}
+                    </span>
                   </p>
                 )}
               </div>

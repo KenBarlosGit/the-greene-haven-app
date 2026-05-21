@@ -5,7 +5,7 @@ import { useAuth } from './hooks/useAuth';
 import { isSupabaseEnabled } from './lib/supabase';
 
 const App = () => {
-  const { user, loading, signInWithEmail, signOut } = useAuth();
+  const { user, loading, signInWithPassword, signUp, signOut } = useAuth();
 
   const signedIn = user !== null;
   const showSignIn = isSupabaseEnabled && !signedIn;
@@ -58,7 +58,7 @@ const App = () => {
             <Loader2 className="animate-spin" size={18} /> Loading…
           </div>
         ) : showSignIn ? (
-          <SignIn onSignIn={signInWithEmail} />
+          <SignIn onSignIn={signInWithPassword} onSignUp={signUp} />
         ) : (
           <BookingApp currentUserId={user?.id ?? null} />
         )}
