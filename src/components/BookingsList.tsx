@@ -1,4 +1,4 @@
-import { CalendarPlus, Pencil, Trash2, Users, Moon, Lock } from 'lucide-react';
+import { CalendarPlus, Pencil, Trash2, Users, Moon } from 'lucide-react';
 import type { Booking } from '../types/booking';
 import { formatRange, fromISODateOnly, nightsBetween } from '../lib/date';
 import { calculateTotal, formatCurrency } from '../lib/pricing';
@@ -59,36 +59,26 @@ const BookingsList = ({ bookings, canEdit, onEdit, onDelete }: Props) => {
                 {booking.notes && <span className="text-zinc-400">· {booking.notes}</span>}
               </p>
             </div>
-            <div className="flex items-center gap-1 self-end sm:self-center">
-              {editable ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => onEdit(booking)}
-                    className="p-2 rounded-md text-zinc-500 hover:text-brand-800 hover:bg-brand-50 transition-colors"
-                    aria-label={`Edit booking for ${booking.guestName}`}
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(booking)}
-                    className="p-2 rounded-md text-zinc-500 hover:text-red-600 hover:bg-zinc-100 transition-colors"
-                    aria-label={`Delete booking for ${booking.guestName}`}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </>
-              ) : (
-                <span
-                  className="p-2 text-zinc-300"
-                  title="Booked by another user"
-                  aria-label="Booked by another user"
+            {editable && (
+              <div className="flex items-center gap-1 self-end sm:self-center">
+                <button
+                  type="button"
+                  onClick={() => onEdit(booking)}
+                  className="p-2 rounded-md text-zinc-500 hover:text-brand-800 hover:bg-brand-50 transition-colors"
+                  aria-label={`Edit booking for ${booking.guestName}`}
                 >
-                  <Lock size={14} />
-                </span>
-              )}
-            </div>
+                  <Pencil size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(booking)}
+                  className="p-2 rounded-md text-zinc-500 hover:text-red-600 hover:bg-zinc-100 transition-colors"
+                  aria-label={`Delete booking for ${booking.guestName}`}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            )}
           </li>
         );
       })}

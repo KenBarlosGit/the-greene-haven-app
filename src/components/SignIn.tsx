@@ -80,7 +80,7 @@ const SignIn = ({ onSignIn, onSignUp }: Props) => {
         {mode === 'signin' ? <Lock size={20} /> : <Mail size={20} />}
       </div>
       <h2 className="font-display text-3xl tracking-wide text-brand-900">
-        {mode === 'signin' ? 'Welcome back' : 'Create an account'}
+        {mode === 'signin' ? 'Welcome to The Greene Haven' : 'Create an account'}
       </h2>
       <p className="text-zinc-500 text-sm mt-1.5 mb-6 leading-relaxed">
         {mode === 'signin'

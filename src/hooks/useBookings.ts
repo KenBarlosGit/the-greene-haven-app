@@ -59,7 +59,7 @@ export interface UseBookingsResult {
   }) => Booking | null;
 }
 
-export function useBookings(authUserId: string | null): UseBookingsResult {
+export function useBookings(): UseBookingsResult {
   const [bookings, setBookings] = useState<Booking[]>(() =>
     isSupabaseEnabled ? [] : sortBookings(loadFromStorage()),
   );
@@ -70,11 +70,6 @@ export function useBookings(authUserId: string | null): UseBookingsResult {
   useEffect(() => {
     if (!isSupabaseEnabled || !supabase) return;
     const sb = supabase;
-    if (!authUserId) {
-      setBookings([]);
-      setLoading(false);
-      return;
-    }
 
     let cancelled = false;
     setLoading(true);
@@ -126,7 +121,7 @@ export function useBookings(authUserId: string | null): UseBookingsResult {
       cancelled = true;
       void sb.removeChannel(channel);
     };
-  }, [authUserId]);
+  }, []);
 
   // ── localStorage fallback persistence ───────────────────────────────────
   useEffect(() => {
