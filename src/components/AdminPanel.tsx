@@ -46,7 +46,7 @@ const AdminPanel = () => {
     let totalRevenue = 0;
     for (const b of bookings) {
       const n = nightsBetween(fromISODateOnly(b.startDateISO), fromISODateOnly(b.endDateISO));
-      const t = calculateTotal(n);
+      const t = calculateTotal(n, b.partySize);
       totalRevenue += t;
       if (b.startDateISO.startsWith(monthPrefix)) monthRevenue += t;
     }
@@ -77,7 +77,7 @@ const AdminPanel = () => {
       const n = nightsBetween(fromISODateOnly(b.startDateISO), fromISODateOnly(b.endDateISO));
       return [
         b.guestName, b.guestEmail, b.startDateISO, b.endDateISO, b.time,
-        n, b.partySize, b.notes ?? '', calculateTotal(n), getStatus(b, todayISO),
+        n, b.partySize, b.notes ?? '', calculateTotal(n, b.partySize), getStatus(b, todayISO),
       ];
     });
     const csv = [headers, ...rows]
@@ -282,7 +282,7 @@ const AdminPanel = () => {
                   </span>
 
                   <span className="text-sm font-bold text-brand-800 tabular-nums">
-                    {formatCurrency(calculateTotal(nights))}
+                    {formatCurrency(calculateTotal(nights, b.partySize))}
                   </span>
 
                   <div className="flex items-center gap-0.5">

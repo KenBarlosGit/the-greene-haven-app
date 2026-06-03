@@ -164,7 +164,7 @@ function adminEmail(b: Record<string, unknown>, nights: number, total: string): 
                   ${row('Check-out', formatDate(b.end_date as string))}
                   ${row('Time', b.time as string)}
                   ${row('Duration', nightLabel)}
-                  ${row('Party size', `${b.party_size} ${Number(b.party_size) === 1 ? 'guest' : 'guests'}`)}
+                  ${row('Party size', `${b.party_size} ${Number(b.party_size) === 0 ? 'guest' : 'guests'}`)}
                   ${b.notes ? row('Notes', b.notes as string) : ''}
                   ${rowBold('Total', total)}
                 </table>

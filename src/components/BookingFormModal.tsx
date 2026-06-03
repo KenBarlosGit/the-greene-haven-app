@@ -27,18 +27,18 @@ interface Props {
 }
 
 const emptyForm: DetailsForm = {
-  hours: '15',
+  hours: '14',
   minutes: '00',
   guestName: '',
   guestEmail: '',
-  partySize: 2,
+  partySize: 1,
   notes: '',
 };
 
 function formFromBooking(b: Booking): DetailsForm {
   const [h, m] = b.time.split(':');
   return {
-    hours: h ?? '15',
+    hours: h ?? '14',
     minutes: m ?? '00',
     guestName: b.guestName,
     guestEmail: b.guestEmail,
@@ -164,8 +164,8 @@ const BookingFormModal = ({
     if (!/^\S+@\S+\.\S+$/.test(form.guestEmail.trim())) {
       next.guestEmail = 'Please enter a valid email';
     }
-    if (!Number.isInteger(form.partySize) || form.partySize < 1 || form.partySize > 12) {
-      next.partySize = 'Party size must be between 1 and 12';
+    if (!Number.isInteger(form.partySize) || form.partySize < 1 || form.partySize > 6) {
+      next.partySize = 'Party size must be between 1 and 6';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
