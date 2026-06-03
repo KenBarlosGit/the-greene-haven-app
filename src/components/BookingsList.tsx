@@ -47,7 +47,7 @@ const BookingsList = ({ bookings, canEdit, onEdit, onDelete }: Props) => {
                   </span>
                 )}
                 <span className="text-brand-800 font-semibold tabular-nums">
-                  {formatCurrency(calculateTotal(nights))}
+                  {formatCurrency(calculateTotal(nights, booking.partySize))}
                 </span>
               </div>
             </div>

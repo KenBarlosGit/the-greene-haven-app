@@ -9,7 +9,7 @@ import {
   PhilippinePeso,
 } from 'lucide-react';
 import { formatRange, nightsBetween } from '../../lib/date';
-import { billableNights, calculateTotal, formatCurrency, RATE_PER_NIGHT } from '../../lib/pricing';
+import { billableNights, calculateTotal, formatCurrency, rateForParty } from '../../lib/pricing';
 
 interface Props {
   start: Date;
@@ -34,7 +34,8 @@ const ConfirmStep = ({
 }: Props) => {
   const nights = nightsBetween(start, end);
   const billed = billableNights(nights);
-  const total = calculateTotal(nights);
+  const nightRate = rateForParty(partySize);
+  const total = calculateTotal(nights, partySize);
 
   return (
     <div>
@@ -61,8 +62,11 @@ const ConfirmStep = ({
         <Row
           icon={<PhilippinePeso size={14} />}
           label="Total"
-          value={`${formatCurrency(total)}`}
-          hint={`${billed} × ${formatCurrency(RATE_PER_NIGHT)}`}
+          value={formatCurrency(total)}
+          hint={partySize > 4
+            ? `${billed} night${billed > 1 ? 's' : ''} × ${formatCurrency(nightRate)} (base + ₱${(partySize - 4) * 200} extra)`
+            : `${billed} night${billed > 1 ? 's' : ''} × ${formatCurrency(nightRate)}`
+          }
           emphasis
         />
       </dl>
