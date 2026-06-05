@@ -47,7 +47,7 @@ const DetailsStep = ({ form, errors, conflictMessage, onChange }: Props) => {
 
       <div className="space-y-3">
         {/* Row 1: name + email */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Full name" error={errors.guestName}>
             <input
               type="text"
@@ -70,7 +70,7 @@ const DetailsStep = ({ form, errors, conflictMessage, onChange }: Props) => {
         </div>
 
         {/* Row 2: check-in time + party size */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Check-in time" error={errors.time}>
             <input
               type="time"
