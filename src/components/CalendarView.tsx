@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import type { CalendarState } from '../hooks/useCalendar';
 import {
   DAYS_OF_WEEK,
@@ -9,6 +10,8 @@ import {
   toISODateOnly,
 } from '../lib/date';
 import { cn } from '../lib/cn';
+
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 interface Props {
   calendar: CalendarState;
@@ -33,17 +36,85 @@ const CalendarView = ({
   onHoverDate,
   onBookedAttempt,
 }: Props) => {
-  const { month, year, daysInMonth, firstDayOfMonth, goToPrevMonth, goToNextMonth } = calendar;
+  const { month, year, daysInMonth, firstDayOfMonth, goToPrevMonth, goToNextMonth, setView } = calendar;
+
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerYear, setPickerYear] = useState(year);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showPicker) setPickerYear(year);
+  }, [year, showPicker]);
+
+  useEffect(() => {
+    if (!showPicker) return;
+    const handler = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setShowPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showPicker]);
 
   const previewEnd =
     rangeStart && !rangeEnd && hoveredDate && hoveredDate >= rangeStart ? hoveredDate : rangeEnd;
 
   return (
     <div className="flex-shrink-0 w-full sm:max-w-[340px] flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <span className="font-semibold text-brand-900 text-base">
+      <div className="flex items-center justify-between mb-4 relative" ref={pickerRef}>
+        <button
+          type="button"
+          onClick={() => setShowPicker((v) => !v)}
+          className="inline-flex items-center gap-1 font-semibold text-brand-900 text-base hover:text-brand-600 transition-colors"
+          aria-label="Pick month and year"
+        >
           {MONTHS_OF_YEAR[month]} {year}
-        </span>
+          <ChevronDown size={14} className={cn('transition-transform duration-150', showPicker && 'rotate-180')} />
+        </button>
+
+        {showPicker && (
+          <div className="absolute top-full left-0 z-20 mt-1.5 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-60">
+            <div className="flex items-center justify-between mb-2.5">
+              <button
+                type="button"
+                onClick={() => setPickerYear((y) => y - 1)}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-500 hover:bg-zinc-100 transition-colors"
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <span className="text-sm font-semibold text-zinc-900">{pickerYear}</span>
+              <button
+                type="button"
+                onClick={() => setPickerYear((y) => y + 1)}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-500 hover:bg-zinc-100 transition-colors"
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-1">
+              {MONTHS_SHORT.map((label, i) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    setView(new Date(pickerYear, i, 1));
+                    setShowPicker(false);
+                  }}
+                  className={cn(
+                    'py-1.5 text-xs font-medium rounded-lg transition-colors',
+                    pickerYear === year && i === month
+                      ? 'bg-brand-800 text-white'
+                      : 'text-zinc-700 hover:bg-brand-50 hover:text-brand-800',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-1">
           <button
             type="button"

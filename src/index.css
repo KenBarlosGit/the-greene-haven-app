@@ -33,3 +33,13 @@ body,
 body {
   background: #ffffff;
 }
+
+/* Hide scrollbar on the main scroll container while keeping scroll */
+main {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+main::-webkit-scrollbar {
+  display: none;
+}

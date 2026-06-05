@@ -178,9 +178,10 @@ const BookingApp = ({ isAdmin }: Props) => {
               type="button"
               onClick={openForNewBooking}
               disabled={!rangeStart}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-gradient-to-br from-brand-600 to-brand-900 text-white text-sm font-semibold hover:from-brand-500 hover:to-brand-800 transition-colors shadow-sm shadow-brand-900/20 disabled:bg-none disabled:bg-zinc-200 disabled:text-zinc-400 disabled:cursor-not-allowed disabled:shadow-none"
+              className="inline-flex items-center justify-center gap-1.5 p-2.5 sm:px-3.5 sm:py-2 rounded-md bg-gradient-to-br from-brand-600 to-brand-900 text-white text-sm font-semibold hover:from-brand-500 hover:to-brand-800 transition-colors shadow-sm shadow-brand-900/20 disabled:bg-none disabled:bg-zinc-200 disabled:text-zinc-400 disabled:cursor-not-allowed disabled:shadow-none"
             >
-              <Plus size={16} /> Add booking
+              <Plus size={16} />
+              <span className="hidden sm:inline">Add booking</span>
             </button>
           </div>
 
@@ -238,12 +239,22 @@ const BookingApp = ({ isAdmin }: Props) => {
         >
           <iframe
             title="Location preview"
-            src="https://maps.google.com/maps?q=14.5895981,121.1006403&z=17&output=embed"
+            src="https://maps.google.com/maps?q=14.5895981,121.1006403(The+Greene+Haven)&z=17&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0, display: 'block', pointerEvents: 'none' }}
             tabIndex={-1}
           />
+          {/* Pin label overlay */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="-translate-y-10 flex flex-col items-center">
+              <div className="bg-white rounded-full shadow-lg px-3 py-1.5 text-xs font-semibold text-brand-900 border border-zinc-100 flex items-center gap-1.5 whitespace-nowrap">
+                <div className="w-2 h-2 rounded-full bg-brand-700 flex-shrink-0" />
+                The Greene Haven
+              </div>
+              <div className="w-2.5 h-2.5 bg-white border-b border-r border-zinc-100 rotate-45 -mt-1.5" />
+            </div>
+          </div>
           <div className="absolute inset-0 bg-brand-900/0 group-hover:bg-brand-900/10 transition-colors" />
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-brand-900/80 to-transparent px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-white">
@@ -300,20 +311,23 @@ const BookingApp = ({ isAdmin }: Props) => {
           onClick={(e) => { if (e.target === e.currentTarget) setShowMapModal(false); }}
         >
           <div className="relative w-full max-w-3xl bg-white rounded-2xl overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-100">
-              <div className="flex items-center gap-2 text-brand-900">
-                <MapPin size={16} className="text-brand-600" />
-                <span className="font-semibold text-sm">Urban Deca Homes Ortigas</span>
-                <span className="text-zinc-400 text-xs">· Pasig City, Metro Manila</span>
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 border-b border-zinc-100 gap-3">
+              <div className="flex items-center gap-2 text-brand-900 min-w-0">
+                <MapPin size={16} className="text-brand-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm truncate">The Greene Haven</p>
+                  <p className="text-zinc-400 text-xs truncate">Urban Deca Homes Ortigas · Pasig City</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <a
                   href="https://www.google.com/maps/place/Urban+Deca+Homes+Ortigas+-+Information+Center/@14.5895981,121.0980654,17z"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-brand-700 hover:bg-brand-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-brand-700 hover:bg-brand-50 transition-colors"
                 >
-                  <ExternalLink size={13} /> Open in Maps
+                  <ExternalLink size={13} />
+                  <span className="hidden sm:inline">Open in Maps</span>
                 </a>
                 <button
                   type="button"
@@ -324,10 +338,10 @@ const BookingApp = ({ isAdmin }: Props) => {
                 </button>
               </div>
             </div>
-            <div style={{ height: '480px' }}>
+            <div className="h-64 sm:h-[480px]">
               <iframe
                 title="The Greene Haven location"
-                src="https://maps.google.com/maps?q=14.5895981,121.1006403&z=17&output=embed"
+                src="https://maps.google.com/maps?q=14.5895981,121.1006403(The+Greene+Haven)&z=17&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0, display: 'block' }}

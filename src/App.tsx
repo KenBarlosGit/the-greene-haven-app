@@ -45,7 +45,7 @@ const App = () => {
       {/* ── Right content panel ──────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-screen bg-white">
         {/* Top bar */}
-        <header className="flex-shrink-0 flex items-center justify-between gap-4 px-5 sm:px-8 py-4 border-b border-zinc-100">
+        <header className="sticky top-0 z-30 flex-shrink-0 flex items-center justify-between gap-4 px-5 sm:px-8 py-4 border-b border-zinc-100 bg-white">
           {/* Mobile brand mark (hidden on desktop where left panel shows) */}
           <div className="flex items-center gap-2.5 lg:hidden">
             <div className="w-8 h-8 rounded-md bg-gradient-to-br from-brand-600 to-brand-900 flex items-center justify-center text-white font-semibold text-sm shadow-sm shadow-brand-900/20">
