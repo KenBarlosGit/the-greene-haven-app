@@ -10,7 +10,7 @@ import { useCalendar } from '../hooks/useCalendar';
 import { useToast } from '../hooks/useToast';
 import type { Booking, BookingDraft, DateRange, FormStep } from '../types/booking';
 import { expandRangeISO, isPastDay, nightsBetween } from '../lib/date';
-import { formatRate, formatCurrency, calculateTotal, RATE_PER_NIGHT } from '../lib/pricing';
+import { formatCurrency, calculateTotal, RATE_PER_NIGHT } from '../lib/pricing';
 import { cn } from '../lib/cn';
 
 const BASE = import.meta.env.BASE_URL;
